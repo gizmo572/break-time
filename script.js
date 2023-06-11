@@ -1,5 +1,5 @@
 let style1 = document.createElement('style');
-style1.appendChild(document.createTextNode('.pop-up { background: blue; position: absolute; top: 0; width: 100vw; height: 100%; z-index: 9999; }'));
+style1.appendChild(document.createTextNode('.pop-up { background: blue; position: fixed; top: 0; width: 100vw; height: 100%; z-index: 9999; }'));
 style1.appendChild(document.createTextNode('.pop-up-content { font-size: 100px; color: red; padding: 1em; }'))
 
 document.head.appendChild(style1);
