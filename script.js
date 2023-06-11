@@ -21,10 +21,11 @@ function runTimer() {
 let popUp = document.createElement('div');
 let popUpText = document.createElement('p');
 let timer = document.createElement('div');
-
 popUpText.textContent = "TAKE A HIKE!!"
 popUp.appendChild(popUpText);
 popUp.appendChild(timer);
+
+
 popUp.classList.add('pop-up');
 popUpText.classList.add('pop-up-content');
 timer.classList.add('timer');

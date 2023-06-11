@@ -2,13 +2,18 @@
     "manifest_version": 3,
     "name": "Break Time",
     "version": "1.0",
-    "start_url": "/",
     "description": "auto-displays a timer over web-page content every X minutes for Y minutes.",
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
             "js": ["script.js"],
             "css": ["styles.css"]
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": ["https://images.unsplash.com/photo-1491609154219-ffd3ffafd992?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"],
+            "matches": ["<all_urls>"]
         }
     ]
 }

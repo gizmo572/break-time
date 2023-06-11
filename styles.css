@@ -3,7 +3,7 @@ style1.appendChild(document.createTextNode('.pop-up-content { font-size: 100px; 
 style1.appendChild(document.createTextNode('.timer { font-size: 150px; color: white; padding: 0 0 1em 2em; } ')) */
 
 .pop-up {
-    background-image: url('chrome-extension://joimkjfljhcgcajdejjcdikidipcjhcl/img/hiker-dude.png');
+    background-image: url('https://images.unsplash.com/photo-1491609154219-ffd3ffafd992?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
     background-size: cover;
     position: fixed;
     top: 0;
