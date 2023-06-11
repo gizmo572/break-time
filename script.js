@@ -1,9 +1,20 @@
-let style1 = document.createElement('style');
+function runTimer() {
+    let content = document.querySelector('div.timer');
+    let seconds = 1 * 60;
+    const intervalID2 = setInterval(() => {
+        let minutes = Math.floor(seconds / 60);
+        let remainingSec = seconds % 60;
+        // console.log(remainingSec.toString().padStart(2, '0'))
+        content.textContent = `${minutes}:${remainingSec.toString().padStart(2,'0')}`;
 
-style1.appendChild(document.createTextNode('.pop-up { background: blue; position: fixed; top: 0; width: 100vw; height: 100%; z-index: 9999; }'));
-style1.appendChild(document.createTextNode('.pop-up-content { font-size: 100px; color: red; padding: 1em 1em 0 1em; }'))
-style1.appendChild(document.createTextNode('.timer { font-size: 150px; color: white; padding: 0 0 1em 2em; } '))
-document.head.appendChild(style1);
+        if (seconds === 0) {
+            content.textContent = 'TIMES UP!!!'
+            clearInterval(intervalID2);
+        } else seconds--;
+
+    }, 1000);
+}
+
 
 
 
@@ -17,24 +28,15 @@ popUp.appendChild(timer);
 popUp.classList.add('pop-up');
 popUpText.classList.add('pop-up-content');
 timer.classList.add('timer');
-document.body.appendChild(popUp);
+console.log(popUp)
+setInterval(() => {
 
+    document.body.appendChild(popUp);
+    
+    runTimer();
 
-function runTimer() {
-    let content = document.querySelector('div.timer');
-    let seconds = 5 * 60;
-    const intervalID = setInterval(() => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSec = seconds % 60;
-    console.log(remainingSec.toString().padStart(2, '0'))
-    content.textContent =  `${minutes}:${remainingSec.toString().padStart(2,'0')}`;
+    setTimeout(() => {
+        popUp.remove();
+    },64000)
 
-    if (seconds === 0) {
-        content.textContent = 'TIMES UP!!!'
-        clearInterval(intervalID);
-    } else seconds--;
-
-    }, 1000);
-}
-
-runTimer();
+}, 10000);

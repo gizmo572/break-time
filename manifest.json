@@ -2,11 +2,13 @@
     "manifest_version": 3,
     "name": "Break Time",
     "version": "1.0",
+    "start_url": "/",
     "description": "auto-displays a timer over web-page content every X minutes for Y minutes.",
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
-            "js": ["script.js"]
+            "js": ["script.js"],
+            "css": ["styles.css"]
         }
     ]
 }
