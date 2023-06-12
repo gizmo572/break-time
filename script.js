@@ -17,9 +17,14 @@ function runTimer() {
 function displaySetUp() {
     timer.textContent = 'GOGOGO!!!'
     let displayIndex = Math.floor(Math.random() * 4);
-    console.log(displayIndex)
     popUpText.textContent = randomDisplay[displayIndex][0];
     popUp.style.backgroundImage = randomDisplay[displayIndex.toString()][1];
+}
+
+function initialDisplay() {
+    timer.textContent = "45 MINS TO BREAK";
+    popUpText.textContent = "TIMER ACTIVATED!";
+    popUp.style.backgroundImage = randomDisplay[0][1];
 }
 
 
@@ -43,10 +48,11 @@ popUp.classList.add('pop-up');
 popUpBox.classList.add('pop-up-box');
 popUpText.classList.add('pop-up-content');
 timer.classList.add('timer');
-displaySetUp();
+// displaySetUp();
+initialDisplay();
 console.log(popUp)
 document.body.appendChild(popUp);
-runTimer();
+// runTimer();
 setTimeout(() => popUp.remove(), 14000)
 setInterval(() => {
 
