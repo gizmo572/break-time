@@ -2,6 +2,9 @@
 .pop-up {
     background-size: cover;
     position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
     top: 0;
     width: 100vw;
     height: 100%;
@@ -11,21 +14,24 @@
 }
 
 .pop-up-box {
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 60vw;
+    /* height: 50vh; */
     background-color: rgba(255,255,255,.60);
-    border-radius: 0 0 50px 0;
+    border-radius: 0 0 50px 50px;
 }
 
 .pop-up-content {
     font-size: 100px;
     font-family: 'Comic Sans MS', sans-serif, Georgia, 'Times New Roman', Times, serif;
     color: rgb(0, 0, 0);
-    /* padding: 0 1em; */
 }
 
 .timer {
     font-size: 150px;
     font-family: 'Impact', 'DIN Condensed', 'Futura', sans-serif;
     color: black;
-    padding: 0 0 1em 1em;
 }
