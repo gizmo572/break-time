@@ -29,11 +29,11 @@
 .pop-up-content {
     font-size: 100px;
     font-family: 'Comic Sans MS', sans-serif, Georgia, 'Times New Roman', Times, serif;
-    color: rgb(0, 0, 0);
+    color: rgb(37, 13, 221);
 }
 
 .timer {
     font-size: 150px;
     font-family: 'Impact', 'DIN Condensed', 'Futura', sans-serif;
-    color: black;
+    color: rgb(5, 107, 0);
 }
