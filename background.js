@@ -11,12 +11,23 @@ const injectedTabs = [];
 
 console.log('hihihi')
 
-/*use setInterval to start break every X seconds. Set var 'breakTime' in local storage so it is accessible to all tabs, and assign it to 'true'. Invoke 'injectTabs'. Invoke setTimeout func that runs after 'secondsRemaining' seconds and resets the var 'secondsRemaining', and sets breakTime to 'false' in local storage.*/
+/*use setInterval to start break every X seconds. Set var 'breakTime' in local storage so it is accessible to all tabs, and assign it to 'true'. Use query method to select for all open chrome tabs and invoke function that iterates through each tab and uses Promise to invoke injectTabs, THEN invoke sendMessageToScriptJS.
+Invoke setTimeout func that runs after 'secondsRemaining' seconds and resets the var 'secondsRemaining', and sets breakTime to 'false' in local storage.*/
 function startTimer() {
     console.log('started!')
     timer = setInterval(function () {
         chrome.storage.local.set({ breakTime: true });
-        injectTabs();
+        chrome.tabs.query({ }, function(tabs) {
+            console.log('active', tabs)
+            tabs.forEach(function (tab) {
+                console.log(tab.id);
+                injectTabs(tab)
+                    .then(() => sendMessageToScriptJS(tab.id))
+                    .catch((error) => {
+                        console.error('Error injecting content script:', error);
+                    });
+            })
+        })
         setTimeout(function() {
             secondsRemaining = 30 * 1;
             chrome.storage.local.set({ breakTime: false });
@@ -28,6 +39,7 @@ function startTimer() {
 function countdown() {
     let countDown = setInterval(() => {
         secondsRemaining--;
+
     }, 1000)
 }
 
@@ -37,33 +49,28 @@ function sendMessageToScriptJS(tabId) {
     chrome.tabs.sendMessage(tabId, secondsRemaining.toString());
 }
 
-/*iterate through each open tab and inject script.js file and styles.css file if not already injected, then invoke 'sendMessageToScriptJS', passing in id of current tab if 'breakTime' is set to true*/
-function injectTabs() {
-    chrome.tabs.query({ }, function(tabs) {
-        console.log('active', tabs)
-        tabs.forEach(function (tab) {
-            console.log(tab.id);
-            if (!injectedTabs.includes(tab.id)) {
-                injectedTabs.push(tab.id);
-                chrome.scripting.executeScript({
-                    target: { tabId: tab.id },
-                    files: ["script.js"],
-                }, function () {
-                    console.log('content script injected and initialized')
-                });
+/*take in 1 parameter which is a tab object. Return Promise that will inject script.js file and styles.css file into passed in 'tab' if that tab has not already been injected.*/
+function injectTabs(tab) {
+    return new Promise((resolve) => {
+        if (!injectedTabs.includes(tab.id)) {
+            injectedTabs.push(tab.id);
+            chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                files: ["script.js"]
+            },
+            () => {
+                console.log('content script injected and initialized')
                 chrome.scripting.insertCSS({
                     target: { tabId: tab.id },
                     files: ['styles.css']
-                }, () => {
+                },
+                () => {
                     // Content script and CSS injected and initialized
-                    console.log('Content script and CSS injected and initialized');
+                    console.log('CSS injected and initialized');
+                    resolve();
                 });
-            }
-            chrome.storage.local.get('breakTime', function(result) {
-                console.log('result', result)
-                if (result.breakTime) sendMessageToScriptJS(tab.id);
-            })
-        })
+            });
+        } else resolve();
     })
 }
 
@@ -98,5 +105,5 @@ setInterval(() => {
     console.log(++tester)
 }, 1000)
 
-//invoke startTimer upon activation of extension
+//invoke startTimer upon activation of extension 
 startTimer();
