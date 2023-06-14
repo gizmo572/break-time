@@ -1,27 +1,3 @@
-
-/*Accept 1 number parameter 'breakRemaining' that comes from 'background.js' and is the total length of the break in seconds. Set up break timer to be displayed and use setInterval method to adjust display every 1 second. Once breakRemaining is 0, popup display is removed and clearInterval method is used to clear setInterval.*/
-
-function runTimer(breakRemaining) {
-    let content = document.querySelector('span.timer');
-    const intervalID = setInterval(() => {
-        let minutes = Math.floor(breakRemaining / 60);
-        let remainingSec = breakRemaining % 60;
-        content.textContent = `${minutes}:${remainingSec.toString().padStart(2,'0')}`;
-
-        if (breakRemaining <= 0) {
-            content.textContent = 'TIMES UP!!!'
-            setTimeout(() => {
-                console.log('removed!');
-                popUp.remove()
-            }, 2000);
-            clearInterval(intervalID);
-        } else {
-            breakRemaining--;
-            console.log(breakRemaining, content.textContent)
-        }
-    }, 1000);
-}
-
 /*Add initial text content to popup display before countdown start. select random message/background-image pair and set them to be displayed.*/
 function displaySetUp() {
     timer.textContent = 'GOGOGO!!!'
@@ -39,17 +15,27 @@ function initialDisplay() {
 }
 
 
-/*Listen for 'message' from the background.js. Upon receiving message, invoke function to finish setting up display, append popUp div to body of DOM, and invoke 'runTimer' func, passing in the 'message' converted to an integer, to start the countdown.*/
+/*Listen for 'message' from the background.js. Upon receiving message, check for conditions indicating that break-time should be initiated. If so, invoke 'displaySetup' to finish setting up display, and append 'popUp' div to body of DOM.
+Reassign displayed timer to the passed in message. Remove popUp div if the message indicates that break-time is over, or that the extension was reset.*/
 chrome.runtime.onMessage.addListener(function (message) {
     console.log('message', message, typeof message)
-    if (message) {
-        console.log('popUp', popUp);
+    if (message !== "ABRA CADABRA!" && (timer.textContent.includes("ABRA CADABRA!") || timer.textContent === "TIMES UP!!!")) {
+        console.log(message,'popUp', popUp);
         displaySetUp();
         document.body.appendChild(popUp);
-        runTimer(Number(message))
+        // runTimer(Number(message))
         // setTimeout(() => {
         //     runTimer(Number(message));
         // }, 1000)
+    }
+    timer.textContent = message
+    if (message == "TIMES UP!!!") {
+        console.log('message', message)
+        popUp.remove();
+    } else if (message == "ABRA CADABRA!") {
+        document.querySelectorAll('.pop-up').forEach(div => {
+            div.remove();
+        })
     }
 });
 
@@ -77,7 +63,6 @@ popUp.classList.add('pop-up');
 popUpBox.classList.add('pop-up-box');
 popUpText.classList.add('pop-up-content');
 timer.classList.add('timer');
-
 
 
 console.log('popUp', popUp)
