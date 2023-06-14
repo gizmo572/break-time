@@ -5,7 +5,7 @@
 let timer;
 let tester = 0;                 //used to track time during testing
 let secondsRemaining = 30 * 1;   //break time in seconds
-
+const magic = 'ABRA CADABRA!'
 //string representing formatted break time remaining to be sent to each tab
 let countdownFormat; 
 
@@ -16,6 +16,7 @@ console.log('hihihi')
 
 /*Invoke 'callInjectAndRemovePopUps' to inject each open tab with script.js and styles.css, and remove any lingering popUp divs. Use setInterval to start break every X seconds. Set var 'breakTime' in local storage so it is accessible to all tabs, and assign it to 'true'. Use query method to select for all open chrome tabs and invoke function that iterates through each tab and invokes 'countdown', passing in id of tab. Outside foreach loop,  invoke 'runtimer' to set 'countdownFormat' and decrement it each second.*/
 function startTimer() {
+    chrome.storage.local.set({ breakTime: false });
     callInjectAndRemovePopUps();
     console.log('started!')
     // console.log(chrome, chrome.tabs)
@@ -68,8 +69,9 @@ function countdown(tabId) {
 function callInjectAndRemovePopUps() {
     chrome.tabs.query({ }, (tabs) => {
         tabs.forEach(tab => {
+            console.log("TABBBBB", tab)
             injectTabs(tab)
-                .then(() => chrome.tabs.sendMessage(tab.id, 'ABRA CADABRA!'))
+                .then(() => chrome.tabs.sendMessage(tab.id, magic))
                 .catch((error) => {
                     console.error('Error injecting content script:', error);
                 });
@@ -105,33 +107,27 @@ function injectTabs(tab) {
     })
 }
 
-/*Listen for newly-focused tabs and, IF NOT ALREADY INJECTED: inject with script.js and styles.css, invoke 'countdown', passing in tab id, if 'breakTime' is true, and push tab id into 'injectedTabs' array*/
+/*Listen for newly-focused tabs and, IF NOT ALREADY INJECTED: invoke 'injectTabs' to inject with script.js and styles.css, THEN, after confirmation of injection, IF 'breakTime' is true,  invoke 'countdown', passing in tab id. Outside of if condition, push tab id into 'injectedTabs' array*/
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
     const tab = await chrome.tabs.get(activeInfo.tabId);
-    console.log('activeInfo', activeInfo)
-    if (!injectedTabs.includes(tab.id)) {
-        console.log('not yet injected', tab.id, 'injected array:', injectedTabs)
-        chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            files: ["script.js"] 
-        }, function () {
-            console.log('content script injected and initialized')
-        });
-        chrome.scripting.insertCSS({
-            target: { tabId: tab.id },
-            files: ['styles.css']
-        }, () => {
-            // Content script and CSS injected and initialized
-            console.log('Content script and CSS injected and initialized');
-        });
-        chrome.storage.local.get('breakTime', function(result) {
-            if (result.breakTime) {
-                countdown(tab.id)
-            };
-        })
-        injectedTabs.push(tab.id);
-    }
-});
+    console.log('activeInfo', activeInfo, 'tab', tab, tab.id)
+    // if (!injectedTabs.includes(tab.id)) {
+    injectTabs(tab)
+        .then(() => {
+            console.log('omg we made it!!!')
+            chrome.storage.local.get('breakTime', function(result) {
+                console.log('WAT. THERES MORE!?!!?')
+                if (result.breakTime) {
+                    console.log('RAAAAAAHHHHHHHHHHH')
+                    countdown(tab.id)
+                } else {
+                    console.log('K?')
+                    chrome.tabs.sendMessage(tab.id, magic);
+                }
+            })
+            injectedTabs.push(tab.id);
+        })     
+})
 
 //for testing
 setInterval(() => {

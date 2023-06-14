@@ -18,21 +18,17 @@ function initialDisplay() {
 /*Listen for 'message' from the background.js. Upon receiving message, check for conditions indicating that break-time should be initiated. If so, invoke 'displaySetup' to finish setting up display, and append 'popUp' div to body of DOM.
 Reassign displayed timer to the passed in message. Remove popUp div if the message indicates that break-time is over, or that the extension was reset.*/
 chrome.runtime.onMessage.addListener(function (message) {
-    console.log('message', message, typeof message)
-    if (message !== "ABRA CADABRA!" && (timer.textContent.includes("ABRA CADABRA!") || timer.textContent === "TIMES UP!!!")) {
+    console.log('message', message, typeof message, timer.textContent)
+    if (message !== magic && (timer.textContent.includes(magic) || timer.textContent === "TIMES UP!!!" || !timer.textContent)) {
         console.log(message,'popUp', popUp);
         displaySetUp();
         document.body.appendChild(popUp);
-        // runTimer(Number(message))
-        // setTimeout(() => {
-        //     runTimer(Number(message));
-        // }, 1000)
     }
     timer.textContent = message
     if (message == "TIMES UP!!!") {
         console.log('message', message)
         popUp.remove();
-    } else if (message == "ABRA CADABRA!") {
+    } else if (message == magic) {
         document.querySelectorAll('.pop-up').forEach(div => {
             div.remove();
         })
@@ -48,6 +44,8 @@ const randomDisplay = {
     3: ["PHONE-A-FRIEND!", "url('https://images.unsplash.com/photo-1525182008055-f88b95ff7980?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80')"]
 }
 
+
+const magic = 'ABRA CADABRA!'
 
 /*declare vars assigned to various html tags, then structure them together so they are all contained within the 'popUp' div*/
 let popUp = document.createElement('div');
