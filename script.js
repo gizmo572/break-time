@@ -1,9 +1,8 @@
-/*Add initial text content to popup display before countdown start. select random message/background-image pair and set them to be displayed.*/
+/*Add initial text content to popup display before countdown start. select message/background-image pair at index 'randomIndex' and set them to be displayed.*/
 function displaySetUp() {
     timer.textContent = 'GOGOGO!!!'
-    let displayIndex = Math.floor(Math.random() * 4);
-    popUpText.textContent = randomDisplay[displayIndex][0];
-    popUp.style.backgroundImage = randomDisplay[displayIndex.toString()][1];
+    popUpText.textContent = randomDisplay[randomIndex][0];
+    popUp.style.backgroundImage = randomDisplay[randomIndex.toString()][1];
 }
 
 /*Set initial display for when the extension is initially activated*/
@@ -14,26 +13,46 @@ function initialDisplay() {
     popUp.style.backgroundImage = randomDisplay[0][1];
 }
 
-
-/*Listen for 'message' from the background.js. Upon receiving message, check for conditions indicating that break-time should be initiated. If so, invoke 'displaySetup' to finish setting up display, and append 'popUp' div to body of DOM.
-Reassign displayed timer to the passed in message. Remove popUp div if the message indicates that break-time is over, or that the extension was reset.*/
-chrome.runtime.onMessage.addListener(function (message) {
-    console.log('message', message, typeof message, timer.textContent)
-    if (message !== magic && (timer.textContent.includes(magic) || timer.textContent === "TIMES UP!!!" || !timer.textContent)) {
-        console.log(message,'popUp', popUp);
-        displaySetUp();
-        document.body.appendChild(popUp);
-    }
-    timer.textContent = message
-    if (message == "TIMES UP!!!") {
-        console.log('message', message)
-        popUp.remove();
-    } else if (message == magic) {
-        document.querySelectorAll('.pop-up').forEach(div => {
-            div.remove();
+/*return a new Promise object that fetches the 'randomDisplayIndex' variable from local storage and reassigns 'randomIndex' to the value of this retreived variable before resolving.*/
+function fetchRandomIndex() {
+    return new Promise((resolve) => {
+        chrome.storage.local.get('randomDisplayIndex', (result) => {
+            randomIndex = result.randomDisplayIndex;
         })
+        resolve();
+    })
+}
+
+/*invoke querySelectorAll method to select for all divs with the 'pop-up' class, and remove all of them. (There shouldn't be more than 1 pop-up div; selecting for multiple is a fail-safe.)*/
+function removeAllPopUps() {
+    console.log('hi?')
+    document.querySelectorAll('.pop-up').forEach(div => {
+        console.log('removed')
+        div.remove();
+    })
+}
+
+
+/*Listen for 'message' from the background.js. Upon receiving message, check for conditions extension activation or the beginning of a break time. If so, invoke removeAllPopUps, then check for condition indicating the beginning of break-time. If so, invoke fetchRandomIndex, THEN, after randomIndex has been retrieved, invoke 'displaySetup' to finish setting up display, and append 'popUp' div to body of DOM.
+Reassign displayed timer to the element at index 0 of passed in message. Remove popUp div if the element at index 2 of message indicates that break-time is over.*/
+chrome.runtime.onMessage.addListener(function (message) {
+    console.log('message', message, timer.textContent)
+    if (message[1]) {
+        console.log(message,'popUp', popUp);
+        removeAllPopUps();
+        if (message[1] !== 'INJECT') {
+            fetchRandomIndex()
+                .then(() => {
+                displaySetUp();
+                document.body.appendChild(popUp);
+                })
+        }
     }
+    timer.textContent = message[0];
+
+    if (message[2]) removeAllPopUps();
 });
+
 
 
 /*object containing message/background-image pairs to be displayed. organized to allow for pairs to be randomly selected easily.*/
@@ -45,7 +64,8 @@ const randomDisplay = {
 }
 
 
-const magic = 'ABRA CADABRA!'
+let randomIndex = 0     //default value
+
 
 /*declare vars assigned to various html tags, then structure them together so they are all contained within the 'popUp' div*/
 let popUp = document.createElement('div');
